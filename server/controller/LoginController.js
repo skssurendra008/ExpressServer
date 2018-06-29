@@ -11,7 +11,7 @@ exports.login = function(req, res, next) {
     var userDeaits = {"user_username": req.body.user_username};
     //console.log(userDeaits);
     loginService.login(userDeaits, function(err,data){
-        console.log(err);
+        console.log("Error ",err);
         console.log("Responce",data);
         if (err) {
             res.send("Invalid user"+JSON.stringify(err));
@@ -53,24 +53,31 @@ exports.login = function(req, res, next) {
 // To get getUserDetails
 exports.getUserDetails = function(req, res, next) {
     console.log("Inside Server Login Controller",req.body);
-    loginService.login({"user_username": req.body.user_username}, function(err,data){
-        console.log(err);
-        console.log("Responce",data);
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) {
-            res.send("Invalid user"+JSON.stringify(err));
-        }
-        else {
-            response = { message: "", success:true, userData: "" };
-            if(data != null && data != "") {
-                response.userData = data[0];
-                response.message = 'User Exists';
-                res.send(response);
-            }
-            else {
-                response.success = false;
-                response.message = 'User do not Exists';
-                res.send(response);
-            }
+            let response = { message:"Token Error. Please login again.", success:false };
+            res.send(JSON.stringify(response));
+        } else {
+            loginService.login({"user_username": req.body.user_username}, function(err,data){
+                // console.log("Error ",err);
+                // console.log("Responce",data);
+                if (err) {
+                    res.send("Invalid user"+JSON.stringify(err));
+                }
+                else {
+                    response = { message: "", success:true, userData: "" };
+                    if(data != null && data != "") {
+                        response.userData = data[0];
+                        response.message = 'User Exists';
+                        res.send(response);
+                    }
+                    else {
+                        response.success = false;
+                        response.message = 'User do not Exists';
+                        res.send(response);
+                    }
+                }
+            });
         }
     });
 }
@@ -79,8 +86,7 @@ exports.getUserDetails = function(req, res, next) {
 exports.registerUser = function(req, res, next) {
     console.log("Inside Server registerUser Controller",req.body);
     loginService.registerUser(req.body,function(err,data){
-        //console.log("Register User Error",err);
-        //console.log(err.errmsg.indexOf("user_username"));          
+        //console.log("Register User Error",err);      
         //console.log("Register User Responce",data);
 
         if(err != null) {
