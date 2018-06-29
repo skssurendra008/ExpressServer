@@ -1,0 +1,14 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~font-awesome/css/font-awesome.css";
+
+body {
+    font-family: -webkit-body;
+}
+.loginContent{
+	padding-top: 15px;
+    padding-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px 10px 0 0;
+    display: inline-block;
+}
