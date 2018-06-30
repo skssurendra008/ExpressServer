@@ -31,7 +31,7 @@ exports.registerUserDevice = function(userDeatils,callback) {
 
 exports.updateRegisterUserDevice = function(userDeatils,callback) {
     console.log("inside updateRegisterUserDevice method");
-    // let updatedDetails = {};
+    let updatedDetails = {};
     updatedDetails['deviceRegisteredId'] = userDeatils.deviceRegisteredId;
     console.log(updatedDetails);
 
