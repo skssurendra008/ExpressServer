@@ -339,16 +339,16 @@ sendNotificationToAndroid = function (validDeviceRegistrationToken, rideTitle, r
     fcmCli.send( {
         to: validDeviceRegistrationToken,
         data: { //some data object (optional)
-            url: 'news',
-            foo:'fooooooooooooo',
-            bar:'bar bar bar',
+            // url: 'news',
+            // foo:'fooooooooooooo',
+            // bar:'bar bar bar',
             rideTitle: rideTitle,
             rideId: rideId
         },
         priority: 'high',
         content_available: true,
         notification: { //notification object
-            title : rideTitle, body : message, sound : "default", badge: "1"
+            title : rideTitle, body : message, sound : "default", badge: "1", click_action: "FCM_PLUGIN_ACTIVITY"
         }
     }, function(err, res){
         callbackLog('sendNotification', err, res);
