@@ -7,17 +7,13 @@ var loginService = require('../services/loginService');
 
 // To check user availability while login
 exports.login = function(req, res, next) {
-    console.log("Inside Server Login Controller",req.body);
+    console.log("Inside Server Login Controller", req.body);
     var userDeaits = {"user_username": req.body.user_username};
-    //console.log(userDeaits);
     loginService.login(userDeaits, function(err,data){
-        console.log("Error ",err);
-        console.log("Responce",data);
         if (err) {
             res.send("Invalid user"+JSON.stringify(err));
         }
         else {
-            //res.send("Token Session JWT , Success message"+JSON.stringify(data));
             response = { message:"", success:true, userData:"" };
             if(data != null && data != "") {
                 var isUserIndex = data.map(function(e) { return e.user_username; }).indexOf(req.body.user_username);
@@ -26,13 +22,20 @@ exports.login = function(req, res, next) {
                     if(data[0].user_password == req.body.user_password) {
                         response.userData = data[0];
                         response.message = 'User Exists';
-                        // res.send(response);
 
                         /** Sendind response with jwtToken**/
                         jwt.sign({user : req.body}, 'secretkey', (err, token) => {
                             response.jwtToken = token;
                             res.send(response);
                         });
+                        
+                        /** insert device details into DB **/
+                        let deviceDetails = {};
+                        deviceDetails.deviceRegisteredId = req.body.deviceRegisteredId;
+                        deviceDetails.devicePlatform = req.body.devicePlatform;
+                        deviceDetails.deviceUsername = req.body.user_username;
+                        let deviceResponse = registerUserDevice(deviceDetails);
+
                     } else {
                         response.success = false;
                         response.message = 'Password Mismatch';
@@ -52,15 +55,13 @@ exports.login = function(req, res, next) {
 
 // To get getUserDetails
 exports.getUserDetails = function(req, res, next) {
-    console.log("Inside Server Login Controller",req.body);
+    console.log("Inside Server Login Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) {
             let response = { message:"Token Error. Please login again.", success:false };
             res.send(JSON.stringify(response));
         } else {
             loginService.login({"user_username": req.body.user_username}, function(err,data){
-                // console.log("Error ",err);
-                // console.log("Responce",data);
                 if (err) {
                     res.send("Invalid user"+JSON.stringify(err));
                 }
@@ -84,13 +85,9 @@ exports.getUserDetails = function(req, res, next) {
 
 // To register new user
 exports.registerUser = function(req, res, next) {
-    console.log("Inside Server registerUser Controller",req.body);
-    loginService.registerUser(req.body,function(err,data){
-        //console.log("Register User Error",err);      
-        //console.log("Register User Responce",data);
-
+    console.log("Inside Server registerUser Controller");
+    loginService.registerUser(req.body,function(err,data) {
         if(err != null) {
-            // res.send(JSON.stringify(err));
             let response = { message:"This Useremail has already taken.", success:true };
             if(err.errmsg.indexOf("user_username") > -1) {
                 response.message = "This Username has already taken."
@@ -98,27 +95,41 @@ exports.registerUser = function(req, res, next) {
             res.send(JSON.stringify(response));
         }
         else {
-            let response = { message:"User Created Successfully.", success:true };
-            res.send(JSON.stringify(response));
+            /** insert device details **/
+            let deviceDetails = {};
+            deviceDetails.deviceRegisteredId = req.body.deviceRegisteredId;
+            deviceDetails.devicePlatform = req.body.devicePlatform;
+            deviceDetails.deviceUsername = req.body.user_username;
+            
+            loginService.registerUserDevice(deviceDetails, function(err,data){
+                if(err != null) {   
+                    /** 1. delete inserted user details **/
+
+                    let response = { message:"Something went wrong with you device. Please register again.", success:false };
+                    res.send(JSON.stringify(response));
+                }
+                else {
+                    let response = { message:"User Created Successfully.", success:true };
+                    res.send(JSON.stringify(response));
+                }
+            });
+
         }
     });
 }
 
 // To update user details 
 exports.updateUserDetails= function(req, res) {
-    console.log("Inside Server updateUserDetails Controller",req.body);
+    console.log("Inside Server updateUserDetails Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) {
-            // console.log("Wrong");
             let response = { message:"Token Error. Please login again.", success:false };
             res.send(JSON.stringify(response));
         } else {
             loginService.updateUserDetails(req.body, function(err, data){
-                console.log(err);
-                console.log("responce",data);
                 if(err) {
                     let response = { message:"Something went wrong. Please try again later.", success:false };
-                        res.send(response);
+                    res.send(response);
                 }
                 else {
                     let response = { message:"Updated Successfully.", success:true };
@@ -130,47 +141,39 @@ exports.updateUserDetails= function(req, res) {
 }
 
 // To register/update new user device details
-exports.registerUserDevice = function(req, res, next) {
-    console.log("Inside Server registerUserDevice Controller",req.body);
+// exports.registerUserDevice = function(req, res, next) {
+registerUserDevice = function(deviceDetails) {
+    console.log("Inside Server registerUserDevice Controller");
     /** Getting the details of the user **/
-    loginService.getRegisterUserDevice({"deviceUsername" : req.body.deviceUsername}, function(err,data){
-        console.log("getRegisterUserDevice Error",err);          
-        console.log("getRegisterUserDevice Responce",data);
+    loginService.getRegisterUserDevice({"deviceUsername" : deviceDetails.deviceUsername}, function(err,data){
         if(err != null) {
-            // res.send(JSON.stringify(err));
             let response = { message:"Something went wrong. Please try again later.", success:false };
-            res.send(JSON.stringify(response));
+            return response;
         }
         else {
             if(data != null && data != "") {
                 /** 1. If user already exist, update its deviceRegisteredId and devicePlatform **/
-                loginService.updateRegisterUserDevice(req.body,function(err,data){
-                    console.log("registerUserDevice Error",err);          
-                    console.log("registerUserDevice Responce",data);
+                loginService.updateRegisterUserDevice(deviceDetails, function(err,data){     
                     if(err != null) {
-                        // res.send(JSON.stringify(err));
                         let response = { message:"Something went wrong.", success:false };
-                        res.send(JSON.stringify(response));
+                        return response;
                     }
                     else {
                         let response = { message:"User Updated Successfully.", success:true };
-                        res.send(JSON.stringify(response));
+                        return response;
                     }
                 });
             }
             else {
                 /** 2. If user do not exist, add user in DB **/
-                loginService.registerUserDevice(req.body,function(err,data){
-                    console.log("registerUserDevice Error",err);          
-                    console.log("registerUserDevice Responce",data);
+                loginService.registerUserDevice(deviceDetails, function(err,data){
                     if(err != null) {
-                        // res.send(JSON.stringify(err));
                         let response = { message:"Something went wrong.", success:false };
-                        res.send(JSON.stringify(response));
+                        return response;
                     }
                     else {
                         let response = { message:"User Registered Successfully.", success:true };
-                        res.send(JSON.stringify(response));
+                        return response;
                     }
                 });
             }
@@ -180,15 +183,10 @@ exports.registerUserDevice = function(req, res, next) {
 
 // Forgrt Password
 exports.forgetPassword = function(req, res, next) {
-    console.log("Inside Server Forget Password Login Controller",req.body);
-    // var userDeaits = {"user_email": req.body.user_email};
-    //console.log(userDeaits);
+    console.log("Inside Server Forget Password Login Controller");
     /** Getting the data of the user **/
-    loginService.login({"user_email": req.body.user_email}, function(err,data){
-        console.log(err);
-        console.log("Responce",data);
+    loginService.login({"user_email": req.body.user_email}, function(err,data) {
         if (err != null) {
-            // res.send("Something went wrong."+JSON.stringify(err));
             let response = { message : "Something went wrong. Please try again later.", success : false };
             res.send(JSON.stringify(response));
         }
@@ -200,7 +198,6 @@ exports.forgetPassword = function(req, res, next) {
 
                 /** Sending the email to the user **/
                 this.sendEmail(data[0], res, response);
-                // res.send(response);
             }
             else {
                 response.success = false;
