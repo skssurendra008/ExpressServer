@@ -24,7 +24,10 @@ exports.login = function(req, res, next) {
                         response.message = 'User Exists';
 
                         /** Sendind response with jwtToken**/
-                        jwt.sign({user : req.body}, 'secretkey', (err, token) => {
+                        let userDetails = {};
+                        userDetails.user_username = req.body.user_username;
+                        userDetails.user_password = req.body.user_password;
+                        jwt.sign({user : userDetails}, 'secretkey', (err, token) => {
                             response.jwtToken = token;
                             res.send(response);
                         });
@@ -87,6 +90,7 @@ exports.getUserDetails = function(req, res, next) {
 exports.registerUser = function(req, res, next) {
     console.log("Inside Server registerUser Controller");
     loginService.registerUser(req.body,function(err,data) {
+        // console.log("RegisterUser = ", data);
         if(err != null) {
             let response = { message:"This Useremail has already taken.", success:true };
             if(err.errmsg.indexOf("user_username") > -1) {
@@ -95,6 +99,7 @@ exports.registerUser = function(req, res, next) {
             res.send(JSON.stringify(response));
         }
         else {
+            let response = { message:"User Created Successfully.", success:true, userData: data};
             /** insert device details **/
             let deviceDetails = {};
             deviceDetails.deviceRegisteredId = req.body.deviceRegisteredId;
@@ -109,8 +114,15 @@ exports.registerUser = function(req, res, next) {
                     res.send(JSON.stringify(response));
                 }
                 else {
-                    let response = { message:"User Created Successfully.", success:true };
-                    res.send(JSON.stringify(response));
+                    /** Sendind response with jwtToken**/
+                    let userDetails = {};
+                    userDetails.user_username = req.body.user_username;
+                    userDetails.user_password = req.body.user_password;
+                    jwt.sign({user : userDetails}, 'secretkey', (err, token) => {
+                        response.jwtToken = token;
+                        res.send(JSON.stringify(response));
+                    });
+                    // res.send(JSON.stringify(response));
                 }
             });
 
