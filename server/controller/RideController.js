@@ -224,7 +224,7 @@ exports.updateRideStatus = function(req, res, next) {
                     // console.log("responce",data);
                     if(req.body.bookingStatus == "Reject") {
                         /** Update the availableSeats now in Ride Table  **/
-                        rideService.updateRideDetailsAfterReject(req.body,function(err, data) {
+                        rideService.updateRideDetailsAfterReject(req.body, function(err, data) {
                             if(err) {
                                 // console.log(err);
                                 let response = { message : "Something went wrong.", success : false };
@@ -240,6 +240,29 @@ exports.updateRideStatus = function(req, res, next) {
                                 /** Sending notification to the ride booked user **/
                                 let rideTitle = "Booking Request Rejected";
                                 let message = "Please book another ride from 'Rides' tab.";
+                                let rideId = req.body.uniqueRideName; /** uniqueRideName booking table **/
+                                this.sendNotification(req.body.myusername, rideTitle, rideId, message);
+                            }
+                        });
+                    }
+                    else if(req.body.bookingStatus == "Cancel") {
+                        /** Update the availableSeats now in Ride Table  **/
+                        rideService.updateRideDetailsAfterReject(req.body, function(err, data) {
+                            if(err) {
+                                // console.log(err);
+                                let response = { message : "Something went wrong.", success : false };
+                                res.send(JSON.stringify(response));
+                            }
+                            else {
+                                let response = { message:"Booking Cancelled Successfully.", success:true };
+                                res.send(JSON.stringify(response));
+
+                                /** Sending email to the ride owner user **/
+                                rideService.sendEmail("cancel", req.body);
+
+                                /** Sending notification to the ride owner user **/
+                                let rideTitle = "Booking Request Cancelled";
+                                let message = "Ride has been cancelled by the user.";
                                 let rideId = req.body.uniqueRideName; /** uniqueRideName booking table **/
                                 this.sendNotification(req.body.myusername, rideTitle, rideId, message);
                             }

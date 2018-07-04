@@ -5,6 +5,10 @@ var BookRideDetailsSchema = mongoose.Schema({
         type: String,
         require: true
      },
+    rideId: { // ride owner username
+        type: String,
+        require: true
+     },
     myusername: {
         type: String,
         require: true

@@ -100,7 +100,7 @@ exports.sendEmail = function(emailtype, data) {
         "<b>Email:</b> "+data.email+"<br>"+
         "<b>Mobile Number:</b> "+data.mobileNumber+"<br>"+
         "<b>Drop Location:</b> "+data.destination+"<br><br>"+
-        "Please <b>Accept/Reject</b> ride in your <b>Posted Rides</b> tab for your convenience.<br><br>"+
+        "Please <b>Accept/Reject</b> ride in your <b>Offered Rides</b> tab for your convenience.<br><br>"+
         "Happy Riding !<br>"+
         "<b>Thanks,</b><br>"+
         "JRides Team.";
@@ -112,7 +112,7 @@ exports.sendEmail = function(emailtype, data) {
         "<b>Name:</b> "+data.rideownerUsername+"<br>"+
         "<b>Email:</b> "+data.rideownerEmail+"<br>"+
         "<b>Mobile Number:</b> "+data.rideownerMobileNumber+"<br><br>"+
-        "<b>You can also check the Vehicle Owner detail in 'My Bookings' tab of the App.</b><br><br>"+
+        "<b>You can also check the Vehicle Owner detail in 'Booked Rides' tab of the App.</b><br><br>"+
         // "<b>Drop Location:</b> "+Baner+"<br><br>"+
         "Happy Riding !<br>"+
         "<b>Thanks,</b><br>"+
@@ -120,7 +120,17 @@ exports.sendEmail = function(emailtype, data) {
         htmlMessage = acceptRidehtml;
         sendemailto = data.email;
         emailSubject = "Booking Request Accepted";
-    }else {
+    } else if (emailtype == 'cancel') {
+        var rejectRidehtml = "Hi "+data.rideownerUsername+", <br><br> Booking was <b> Cancelled </b> by the user due to some reason. Below are the user details : <br>"+ 
+        "<b>Name:</b> "+data.myusername+"<br>"+
+        "<b>Email:</b> "+data.email+"<br><br>"+
+        "Happy Riding !<br>"+
+        "<b>Thanks,</b><br>"+
+        "JRides Team."
+        htmlMessage = rejectRidehtml;
+        sendemailto = data.rideownerEmail;
+        emailSubject = "Booking Request Rejected";
+    } else {
         var rejectRidehtml = "Hi "+data.myusername+", <br><br> Your booking request was <b> Rejected </b> due to some reason. Please booking another ride. <br><br>"+ 
         "Happy Riding !<br>"+
         "<b>Thanks,</b><br>"+
