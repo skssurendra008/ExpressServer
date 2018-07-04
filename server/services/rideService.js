@@ -109,7 +109,7 @@ exports.sendEmail = function(emailtype, data) {
         emailSubject = "Booking Request";
     } else if (emailtype == 'accept') {
         var acceptRidehtml = "Hi "+data.myusername+", <br><br> Your booking request was <b> Accepted </b>. Below are the Owner details : <br>"+ 
-        "<b>Name:</b> "+data.rideownerUsername+"<br>"+
+        "<b>Name:</b> "+data.username+"<br>"+
         "<b>Email:</b> "+data.rideownerEmail+"<br>"+
         "<b>Mobile Number:</b> "+data.rideownerMobileNumber+"<br><br>"+
         "<b>You can also check the Vehicle Owner detail in 'Booked Rides' tab of the App.</b><br><br>"+
@@ -121,7 +121,7 @@ exports.sendEmail = function(emailtype, data) {
         sendemailto = data.email;
         emailSubject = "Booking Request Accepted";
     } else if (emailtype == 'cancel') {
-        var rejectRidehtml = "Hi "+data.rideownerUsername+", <br><br> Booking was <b> Cancelled </b> by the user due to some reason. Below are the user details : <br>"+ 
+        var rejectRidehtml = "Hi "+data.username+", <br><br> Booking was <b> Cancelled </b> by the user due to some reason. Below are the user details : <br>"+ 
         "<b>Name:</b> "+data.myusername+"<br>"+
         "<b>Email:</b> "+data.email+"<br><br>"+
         "Happy Riding !<br>"+
