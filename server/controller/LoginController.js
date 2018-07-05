@@ -89,12 +89,15 @@ exports.getUserDetails = function(req, res, next) {
 // To register new user
 exports.registerUser = function(req, res, next) {
     console.log("Inside Server registerUser Controller");
-    loginService.registerUser(req.body,function(err,data) {
+    loginService.registerUser(req.body,function(err, data) {
         // console.log("RegisterUser = ", data);
+        // console.log("RegisterUser Error = ", err);
         if(err != null) {
-            let response = { message:"This Useremail has already taken.", success:true };
+            let response = { message:"", success:true };
             if(err.errmsg.indexOf("user_username") > -1) {
-                response.message = "This Username has already taken."
+                response.message = "The username is already registered."
+            } else if(err.errmsg.indexOf("user_email") > -1) {
+                response.message = "The email address is already registered."
             }
             res.send(JSON.stringify(response));
         }

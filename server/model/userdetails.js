@@ -27,7 +27,8 @@ var UserDetailsSchema = mongoose.Schema({
     },
     user_email: {
         type: String,
-        require: true
+        require: true,
+        unique: true
     },
     user_profileimage: {
         type: String
