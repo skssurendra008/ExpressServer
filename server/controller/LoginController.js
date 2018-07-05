@@ -138,16 +138,29 @@ exports.updateUserDetails= function(req, res) {
             let response = { message:"Token Error. Please login again.", success:false };
             res.send(JSON.stringify(response));
         } else {
-            loginService.updateUserDetails(req.body, function(err, data){
-                if(err) {
-                    let response = { message:"Something went wrong. Please try again later.", success:false };
-                    res.send(response);
-                }
-                else {
-                    let response = { message:"Updated Successfully.", success:true };
-                    res.send(JSON.stringify(response));
-                }
-            });
+            if(req.body.user_updatedetail) {
+                loginService.updateUserDetails(req.body, function(err, data){
+                    if(err) {
+                        let response = { message:"Something went wrong. Please try again later.", success:false };
+                        res.send(response);
+                    }
+                    else {
+                        let response = { message:"Updated Successfully.", success:true };
+                        res.send(JSON.stringify(response));
+                    }
+                });
+            } else {
+                loginService.updateUsercompleteDetails(req.body, function(err, data){
+                    if(err) {
+                        let response = { message:"Something went wrong. Please try again later.", success:false };
+                        res.send(response);
+                    }
+                    else {
+                        let response = { message:"Updated Successfully.", success:true };
+                        res.send(JSON.stringify(response));
+                    }
+                });
+            }
         }
     });
 }

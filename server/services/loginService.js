@@ -18,6 +18,23 @@ exports.updateUserDetails = function(userDeatils,callback) {
     dbUtil.updateUserDetails(ess_userdetails,userDeatils,callback);
 }
 
+exports.updateUsercompleteDetails = function(userDeatils,callback) {
+    console.log("inside updateUsercompleteDetails method");
+    let updatedDetails = {};
+    updatedDetails['user_type'] = userDeatils.user_type;
+    updatedDetails['user_mobile'] = userDeatils.user_type;
+    updatedDetails['homeLocation'] = userDeatils.homeLocation;
+    updatedDetails['rideRoute'] = userDeatils.rideRoute;
+    updatedDetails['vehicleType'] = userDeatils.vehicleType;
+    updatedDetails['vehicleName'] = userDeatils.vehicleName;
+    updatedDetails['vehicleNumber'] = userDeatils.vehicleNumber;
+    updatedDetails['availableSeats'] = userDeatils.availableSeats;
+    // console.log(updatedDetails);
+
+    let updateWith = {};
+    updateWith['user_username'] = userDeatils.user_username;
+    dbUtil.updateDetails(ess_userdetails, updateWith, userDeatils, callback);
+}
 
 exports.getRegisterUserDevice = function(userDeatils,callback) {
     console.log("inside registerUserDevice method");

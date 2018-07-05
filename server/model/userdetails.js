@@ -6,18 +6,22 @@ var UserDetailsSchema = mongoose.Schema({
         require: true,
         unique: true
      },
-    user_firstname: {
+    user_fullname: {
         type: String,
         require: true
-     },
-    user_lastname: {
-        type: String,
-        require: true
-     },
-     user_password: {
+    },
+//     user_firstname: {
+//         type: String,
+//         require: true
+//     },
+//     user_lastname: {
+//         type: String,
+//         require: true
+//     },
+    user_password: {
          type: String,
          require: true
-     },
+    },
     user_mobile: {
         type: Number
     },
@@ -27,6 +31,27 @@ var UserDetailsSchema = mongoose.Schema({
     },
     user_profileimage: {
         type: String
+    },
+    user_type: {
+        type: String
+    },
+    homeLocation: {
+        type: String
+    },
+    rideRoute: {
+        type: String
+    },
+    vehicleType: {
+        type: String
+    },
+    vehicleName: {
+        type: String
+    },
+    vehicleNumber: {
+        type: String
+    },
+    availableSeats: {
+        type: Number
     }/*,
      user_address: {
          type: String
