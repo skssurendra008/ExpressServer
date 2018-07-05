@@ -20,6 +20,7 @@ router.post('/myPostedRides', verifyToken, rideController.myPostedRides);
 router.post('/bookRide', verifyToken, rideController.bookRide);
 router.post('/myBookedRide', verifyToken, rideController.myBookedRide);
 router.post('/updateRideStatus', verifyToken, rideController.updateRideStatus);
+router.post('/cancelTrip', verifyToken, rideController.cancelTrip);
 
 
 router.get('/',function(req,res,next){

@@ -75,6 +75,12 @@ exports.updateRideStatusInBookingTable = function(Table, queryParam, callback
     });
 }
 
+exports.deleteTable = function(Table, queryParam, callback) {
+    Table.remove({"_id" : queryParam._id}, function(err, doc) {
+        callback(err, doc);
+    });
+}
+
 exports.delete = function(Table, callback) {
     var newDate = new Date();
     newDate.setDate(newDate.getDate()-6);

@@ -206,6 +206,70 @@ exports.myBookedRide = function(req, res, next) {
     });
 }
 
+
+// To cancelTrip
+exports.cancelTrip = function(req, res, next) {
+    console.log("Inside Server cancelTrip Controller", req.body);
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if (err) {
+            let response = { message:"Token Error. Please login again.", success:false };
+            res.send(JSON.stringify(response));
+        } else {
+            if(req.body.bookings) {
+                /** 1. Update the status of all booking table **/
+                var allBookings = req.body.bookings;
+                for(let x=0; x<allBookings.length; x++) {
+                    let bookingStatusDetails = {};
+                    bookingStatusDetails.uniqueRideName = allBookings[x].uniqueRideName;
+                    bookingStatusDetails.bookingStatus = "Cancel Trip";
+                    rideService.updateRideStatusInBookingTable(bookingStatusDetails, function(err, data) {
+                        console.log("Cancel Trip =  ", data);
+                        if(err) {
+                            let response = { message : "Something went wrong. Please try again later.", success : false };
+                            res.send(JSON.stringify(response));
+                        }
+                        else {
+                            // /** Sending email to the ride booked user **/
+                            rideService.sendEmail("canceltrip", allBookings[x]);
+
+                            /** Sending notification to the ride booked user **/
+                            let rideTitle = "Trip Cancelled";
+                            let message = "Please book another ride from 'Rides' tab.";
+                            let rideId = allBookings[x].uniqueRideName; /** uniqueRideName booking table **/
+                            this.sendNotification(req.body.myusername, rideTitle, rideId, message);
+                        }
+                    });
+                }
+                /** 2. delete the Ride **/
+                rideService.deleteRide(req.body, function(err,data) {
+                    if(err) {
+                        let response = { message : "Something went wrong. Please try again later.", success : false };
+                        res.send(JSON.stringify(response));
+                    }
+                    else {
+                        let response = { message:"You Trip has been Cancelled.", success:true };
+                        res.send(JSON.stringify(response));
+                    }
+                });
+            } else {
+                /** delete the Ride **/
+                rideService.deleteRide(req.body, function(err, data) {
+                    if(err) {
+                        let response = { message : "Something went wrong.", success : false };
+                        res.send(JSON.stringify(response));
+                    }
+                    else {
+                        let response = { message:"Your Trip has been Cancelled.", success:true };
+                        res.send(JSON.stringify(response));
+                    }
+                });
+
+            }
+        }
+    });
+}
+
+
 // To updateRideStatus
 exports.updateRideStatus = function(req, res, next) {
     console.log("Inside Server updateRideStatus Controller", req.body);

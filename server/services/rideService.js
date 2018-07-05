@@ -69,6 +69,11 @@ exports.updateRideStatusInBookingTable = function(rideDeatils,callback) {
     dbUtil.updateRideStatusInBookingTable(bookRideDetails,rideDeatils,callback);
 }
 
+exports.deleteRide = function(rideDeatils,callback) {
+    console.log("inside deleteRide method");
+    dbUtil.deleteTable(postRideDetails,rideDeatils,callback);
+}
+
 // exports.updateRideStatusInRideTable = function(rideDeatils,callback) {
 //     console.log("inside updateRideStatusInRideTable method");
 //     dbUtil.updateRideStatusInRideTable(bookRideDetails,rideDeatils,callback);
@@ -129,6 +134,14 @@ exports.sendEmail = function(emailtype, data) {
         "JRides Team."
         htmlMessage = rejectRidehtml;
         sendemailto = data.rideownerEmail;
+        emailSubject = "Booking Request Rejected";
+    } else if (emailtype == 'canceltrip') {
+        var rejectRidehtml = "Hi "+data.myusername+", <br><br> This trip has been <b> Cancelled </b> by the user due to some reason. Please booking another ride. <br><br>"+ 
+        "Happy Riding !<br>"+
+        "<b>Thanks,</b><br>"+
+        "JRides Team."
+        htmlMessage = rejectRidehtml;
+        sendemailto = data.email;
         emailSubject = "Booking Request Rejected";
     } else {
         var rejectRidehtml = "Hi "+data.myusername+", <br><br> Your booking request was <b> Rejected </b> due to some reason. Please booking another ride. <br><br>"+ 
