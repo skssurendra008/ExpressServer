@@ -16,7 +16,7 @@ exports.getAll = function(Table, queryParam, callback) {
     console.log("inside getAll method");
     Table.find(queryParam, function(err, doc) {
         callback(err,doc);
-    });
+    }).sort( { departureTime: -1 } );
 };
 
 exports.insertUser = function(Table, queryParam, callback) {
