@@ -46,21 +46,29 @@ exports.updateDetails = function(Table, updateWith, updatedDetails, callback)
         callback(err,doc);
     });
 }
- 
+
 exports.updateRideDetails = function(Table, queryParam, callback) {
     console.log("Inside DBUtilConn updateRideDetails method");
-    let seats = queryParam.availableSeats-queryParam.bookedSeats;
-    
-    Table.update({'_id': queryParam.rideId},  { $set: {availableSeats: seats}, $push: { bookings: queryParam.uniqueRideName } }, function(err, doc){
+    // let seats = queryParam.availableSeats-queryParam.bookedSeats;
+    // Table.update({'_id': queryParam.rideId},  { $set: {availableSeats: seats}, $push: { bookings: queryParam.uniqueRideName } }, function(err, doc){
+    //     callback(err,doc);
+    // });
+
+    let bookedSeats = queryParam.bookedSeats;
+    Table.update({'_id': queryParam.rideId},  { $inc: {availableSeats: -bookedSeats}, $push: { bookings: queryParam.uniqueRideName } }, function(err, doc){
         callback(err,doc);
     });
 }
 
 exports.updateRideDetailsAfterReject = function(Table, queryParam, callback) {
     console.log("Inside DBUtilConn updateRideDetailsAfterReject method");
-    // console.log(queryParam);
 
-    Table.update({'_id': queryParam._id},  { $set: {availableSeats: queryParam.updatedSeats}, $pull: { bookings: queryParam.uniqueRideName } }, function(err, doc){
+    // Table.update({'_id': queryParam._id},  { $set: {availableSeats: queryParam.updatedSeats}, $pull: { bookings: queryParam.uniqueRideName } }, function(err, doc){
+    //     callback(err,doc);
+    // });
+
+    // { $inc: { <field1>: <amount1>, <field2>: <amount2>, ... } }
+    Table.update({'_id': queryParam.rideId},  { $inc: {availableSeats: queryParam.bookedSeats}, $pull: { bookings: queryParam.uniqueRideName } }, function(err, doc){
         callback(err,doc);
     });
 }
