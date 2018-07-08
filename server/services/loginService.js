@@ -58,4 +58,8 @@ exports.updateRegisterUserDevice = function(userDeatils,callback) {
     dbUtil.updateDetails(userDeviceDetails, updateWith, userDeatils,callback);
 }
 
+exports.deleteUser = function(rideDeatils,callback) {
+    console.log("inside deleteUser method");
+    dbUtil.deleteTable(ess_userdetails, rideDeatils, callback);
+}
    

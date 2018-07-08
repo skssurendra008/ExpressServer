@@ -90,7 +90,7 @@ exports.getUserDetails = function(req, res, next) {
 exports.registerUser = function(req, res, next) {
     console.log("Inside Server registerUser Controller");
     loginService.registerUser(req.body,function(err, data) {
-        // console.log("RegisterUser = ", data);
+        console.log("RegisterUser = ", data);
         // console.log("RegisterUser Error = ", err);
         if(err != null) {
             let response = { message:"", success:true };
@@ -109,12 +109,19 @@ exports.registerUser = function(req, res, next) {
             deviceDetails.devicePlatform = req.body.devicePlatform;
             deviceDetails.deviceUsername = req.body.user_username;
             
-            loginService.registerUserDevice(deviceDetails, function(err,data){
-                if(err != null) {   
+            loginService.registerUserDevice(deviceDetails, function(deviceerr, devicedata) {
+                if(deviceerr != null) {
                     /** 1. delete inserted user details **/
-
-                    let response = { message:"Something went wrong with you device. Please register again.", success:false };
-                    res.send(JSON.stringify(response));
+                    loginService.deleteUser(data._id, function(deleteusererr, deleteuserdata) {
+                        if(deleteusererr != null) {
+                            /** If user not deleted and now mobile details are not available so login again **/
+                            let response = { message:"Something went wrong. Please login again to get mobile notification.", success:false };
+                            res.send(JSON.stringify(response));
+                        } else {
+                            let response = { message:"Something went wrong with you device. Please register again.", success:false };
+                            res.send(JSON.stringify(response));
+                        }
+                    });
                 }
                 else {
                     /** Sendind response with jwtToken**/
@@ -125,7 +132,6 @@ exports.registerUser = function(req, res, next) {
                         response.jwtToken = token;
                         res.send(JSON.stringify(response));
                     });
-                    // res.send(JSON.stringify(response));
                 }
             });
 
