@@ -23,7 +23,7 @@ exports.postRide = function(req, res, next) {
                     res.send(JSON.stringify(response));
                 }
                 else {
-                    let response = { message:"Ride Posted Successfully. Please Accept/Reject ride in your 'Posted Rides' tab after booking happened.", success:true };
+                    let response = { message:"The ride has been offered, please Accept/Reject bookings in 'Offered Rides' tab.", success:true };
                     res.send(JSON.stringify(response));
                 }
             });
@@ -102,7 +102,7 @@ exports.myPostedRides = function(req, res, next) {
 
 // To book new Ride
 exports.bookRide = function(req, res, next) {
-    console.log("Inside Server bookRide Controller",req.body);
+    console.log("Inside Server bookRide Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) {
             let response = { message:"Token Error. Please login again.", success:false };
@@ -126,7 +126,7 @@ exports.bookRide = function(req, res, next) {
                             console.log("verifyBookedRide Error", err);
                             console.log("verifyBookedRide Data", data);
                             if(err != null) {
-                                let response = { message:"Something went wrong.", success:false };
+                                let response = { message:"Something went wrong. Please try again later.", success:false };
                                 res.send(JSON.stringify(response));
                             }
                             else {
@@ -136,16 +136,16 @@ exports.bookRide = function(req, res, next) {
                                 }
                                 else { /** Add booking in the booking table **/
                                     rideService.bookRide(req.body, function(err, data){
-                                        console.log("Book Ride Error",err);
+                                        // console.log("Book Ride Error",err);
                                         console.log("Book Ride Data",data);
                                         if(err != null) {
-                                            let response = { message:"Something went wrong.", success:false };
+                                            let response = { message:"Something went wrong. Please try again later.", success:false };
                                             res.send(JSON.stringify(response));
                                         }
                                         else {
                                             /********* Now update this booking in Ride Table **********/
                                             /** 1. Reduce/Update the availableSeats from AllRides table **/
-                                            /** 2. Add add booking in bookings array of AllRides table **/
+                                            /** 2. Add booking in bookings array of AllRides table **/
                                             rideService.updateRideDetails(req.body,function(err,data){
                                                 console.log("updateRideDetails Error", err);
                                                 // console.log("updateRideDetails Response", data);
@@ -154,11 +154,11 @@ exports.bookRide = function(req, res, next) {
                     
                     
                                                     /** 2. Send response to the User **/
-                                                    let response = { message : "Something went wrong.", success : false };
+                                                    let response = { message : "Something went wrong. Please try again later.", success : false };
                                                     res.send(JSON.stringify(response));
                                                 }
                                                 else {
-                                                    let response = { message : "Ride Booked Successfully. Please check your Booking Status in 'My Booking' tab.", success : true };
+                                                    let response = { message : "The ride has been booked, please check your Booking Status in 'Booked Rides' tab.", success : true };
                                                     res.send(JSON.stringify(response));
 
                                                     /** Sending email to the owner of the vehicle**/
@@ -166,7 +166,7 @@ exports.bookRide = function(req, res, next) {
 
                                                     /** Sending notification to the owner of the vehicle **/
                                                     let title = "Booking Request";
-                                                    let message = "Please Accept/Reject Ride from 'Posted Rides' tab.";
+                                                    let message = "Please Accept/Reject Ride from 'Offered Rides' tab.";
                                                     this.sendNotification(req.body.rideownerUsername, title, req.body.rideId, message);
                                                 }
                                             });
@@ -193,7 +193,7 @@ exports.myBookedRide = function(req, res, next) {
             rideService.getMyBookedRide(req.body, function(err, data) {
                 if(err != null) {
                     // console.log("myBookedRide Error", err);
-                    let response = { message : "Something went wrong.", success : false };
+                    let response = { message : "Something went wrong. Please try again later.", success : false };
                     res.send(JSON.stringify(response));
                 }
                 else {
@@ -236,7 +236,7 @@ exports.cancelTrip = function(req, res, next) {
                             let rideTitle = "Trip Cancelled";
                             let message = "Please book another ride from 'Rides' tab.";
                             let rideId = allBookings[x].uniqueRideName; /** uniqueRideName booking table **/
-                            this.sendNotification(req.body.myusername, rideTitle, rideId, message);
+                            this.sendNotification(allBookings[x].myusername, rideTitle, rideId, message);
                         }
                     });
                 }
@@ -281,7 +281,7 @@ exports.updateRideStatus = function(req, res, next) {
             rideService.updateRideStatusInBookingTable(req.body,function(err,data) {
                 if(err) {
                     // console.log("Error ", err);
-                    let response = { message : "Something went wrong.", success : false };
+                    let response = { message : "Something went wrong. Please try again later.", success : false };
                     res.send(JSON.stringify(response));
                 }
                 else {
@@ -291,7 +291,7 @@ exports.updateRideStatus = function(req, res, next) {
                         rideService.updateRideDetailsAfterReject(req.body, function(err, data) {
                             if(err) {
                                 // console.log(err);
-                                let response = { message : "Something went wrong.", success : false };
+                                let response = { message : "Something went wrong. Please try again later.", success : false };
                                 res.send(JSON.stringify(response));
                             }
                             else {
@@ -314,7 +314,7 @@ exports.updateRideStatus = function(req, res, next) {
                         rideService.updateRideDetailsAfterReject(req.body, function(err, data) {
                             if(err) {
                                 // console.log(err);
-                                let response = { message : "Something went wrong.", success : false };
+                                let response = { message : "Something went wrong. Please try again later.", success : false };
                                 res.send(JSON.stringify(response));
                             }
                             else {
@@ -328,7 +328,7 @@ exports.updateRideStatus = function(req, res, next) {
                                 let rideTitle = "Booking Request Cancelled";
                                 let message = "Ride has been cancelled by the user.";
                                 let rideId = req.body.uniqueRideName; /** uniqueRideName booking table **/
-                                this.sendNotification(req.body.myusername, rideTitle, rideId, message);
+                                this.sendNotification(req.body.username, rideTitle, rideId, message);
                             }
                         });
                     }

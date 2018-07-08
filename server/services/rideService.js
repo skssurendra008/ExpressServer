@@ -134,15 +134,15 @@ exports.sendEmail = function(emailtype, data) {
         "JRides Team."
         htmlMessage = rejectRidehtml;
         sendemailto = data.rideownerEmail;
-        emailSubject = "Booking Request Rejected";
+        emailSubject = "Booking Request Cancelled";
     } else if (emailtype == 'canceltrip') {
-        var rejectRidehtml = "Hi "+data.myusername+", <br><br> This trip has been <b> Cancelled </b> by the user due to some reason. Please booking another ride. <br><br>"+ 
+        var rejectRidehtml = "Hi "+data.myusername+", <br><br> This trip has been <b> Cancelled </b> by the user due to some reason. Please book another ride. <br><br>"+ 
         "Happy Riding !<br>"+
         "<b>Thanks,</b><br>"+
         "JRides Team."
         htmlMessage = rejectRidehtml;
         sendemailto = data.email;
-        emailSubject = "Booking Request Rejected";
+        emailSubject = "Trip Cancelled";
     } else {
         var rejectRidehtml = "Hi "+data.myusername+", <br><br> Your booking request was <b> Rejected </b> due to some reason. Please booking another ride. <br><br>"+ 
         "Happy Riding !<br>"+
