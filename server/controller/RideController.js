@@ -33,13 +33,11 @@ exports.postRide = function(req, res, next) {
 
 // To get AllRide
 exports.getAllRide = function(req, res, next) {
-    console.log("Inside Server getAllRide Controller",req.body);
+    console.log("Inside Server getAllRide Controller");
     if(req.body.rideownerUsername) {
         rideService.getAllRide( {$and: [{"departureTime": {$gte: new Date()}}, {"rideownerUsername":{$ne: req.body.rideownerUsername}}] }, function(err, data){
-            console.log("getAllRide Error",err);
-    
+            // console.log("getAllRide Error",err);
             if(err != null) {
-                // res.send(JSON.stringify(err));
                 let response = { message:"This Useremail has already taken.", success:true };
                 if(err.errmsg.indexOf("user_username") > -1) {
                     response.message = "This Username has already taken."
@@ -47,17 +45,13 @@ exports.getAllRide = function(req, res, next) {
                 res.send(JSON.stringify(response));
             }
             else {
-                // let response = { message:"Ride Posted Successfully.", success:true };
-                console.log(data);
                 res.send(JSON.stringify(data));
             }
         });
     }
     else {
-        // console.log("Date");
-        // console.log(new Date());
         rideService.getAllRide({"departureTime": {$gte: new Date()}}, function(err, data){
-            console.log("getAllRide Error",err);
+            // console.log("getAllRide Error",err);
             if(err != null) {
                 // res.send(JSON.stringify(err));
                 let response = { message:"This Useremail has already taken.", success:true };
@@ -109,7 +103,7 @@ exports.bookRide = function(req, res, next) {
             res.send(JSON.stringify(response));
         } else {
             rideService.getAllRide({"_id": req.body.rideId}, function(err, data){
-                console.log("getAllRide Error",err);
+                // console.log("getAllRide Error",err);
                 if(err != null) {
                     // res.send(JSON.stringify(err));
                     let response = { message:"Something went wrong.", success:false };
@@ -123,8 +117,8 @@ exports.bookRide = function(req, res, next) {
                     }
                     else { /** Check is You have already booked this Ride **/
                         rideService.verifyBookedRide({"uniqueRideName": req.body.uniqueRideName}, function(err, data){
-                            console.log("verifyBookedRide Error", err);
-                            console.log("verifyBookedRide Data", data);
+                            // console.log("verifyBookedRide Error", err);
+                            // console.log("verifyBookedRide Data", data);
                             if(err != null) {
                                 let response = { message:"Something went wrong. Please try again later.", success:false };
                                 res.send(JSON.stringify(response));
@@ -137,7 +131,7 @@ exports.bookRide = function(req, res, next) {
                                 else { /** Add booking in the booking table **/
                                     rideService.bookRide(req.body, function(err, data){
                                         // console.log("Book Ride Error",err);
-                                        console.log("Book Ride Data",data);
+                                        // console.log("Booked Ride Data",data);
                                         if(err != null) {
                                             let response = { message:"Something went wrong. Please try again later.", success:false };
                                             res.send(JSON.stringify(response));
@@ -146,12 +140,15 @@ exports.bookRide = function(req, res, next) {
                                             /********* Now update this booking in Ride Table **********/
                                             /** 1. Reduce/Update the availableSeats from AllRides table **/
                                             /** 2. Add booking in bookings array of AllRides table **/
-                                            rideService.updateRideDetails(req.body,function(err,data){
-                                                console.log("updateRideDetails Error", err);
-                                                // console.log("updateRideDetails Response", data);
-                                                if(err) {
-                                                    /** 1. delete the booked ride **/
-                    
+                                            rideService.updateRideDetails(req.body,function(updaterideerr, updateridedata){
+                                                console.log("updateRideDetails Error", updaterideerr);
+                                                // console.log("updateRideDetails Response", updateridedata);
+                                                if(updaterideerr) {
+                                                    /** 1. delete the booked ride from 'bookedRideDetails' table **/
+                                                    rideService.deleteBookedRide(data._id, function(err,data) {
+                                                        if(err) { }
+                                                        else { }
+                                                    });
                     
                                                     /** 2. Send response to the User **/
                                                     let response = { message : "Something went wrong. Please try again later.", success : false };
@@ -184,7 +181,7 @@ exports.bookRide = function(req, res, next) {
 
 // to get myBookedRide
 exports.myBookedRide = function(req, res, next) {
-    console.log("Inside Server myBookedRide Controller", req.body);
+    console.log("Inside Server myBookedRide Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) {
             let response = { message:"Token Error. Please login again.", success:false };
@@ -209,7 +206,7 @@ exports.myBookedRide = function(req, res, next) {
 
 // To cancelTrip
 exports.cancelTrip = function(req, res, next) {
-    console.log("Inside Server cancelTrip Controller", req.body);
+    console.log("Inside Server cancelTrip Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) {
             let response = { message:"Token Error. Please login again.", success:false };
@@ -223,7 +220,7 @@ exports.cancelTrip = function(req, res, next) {
                     bookingStatusDetails.uniqueRideName = allBookings[x].uniqueRideName;
                     bookingStatusDetails.bookingStatus = "Cancel Trip";
                     rideService.updateRideStatusInBookingTable(bookingStatusDetails, function(err, data) {
-                        console.log("Cancel Trip =  ", data);
+                        // console.log("Cancel Trip =  ", data);
                         if(err) {
                             let response = { message : "Something went wrong. Please try again later.", success : false };
                             res.send(JSON.stringify(response));
@@ -272,7 +269,7 @@ exports.cancelTrip = function(req, res, next) {
 
 // To updateRideStatus
 exports.updateRideStatus = function(req, res, next) {
-    console.log("Inside Server updateRideStatus Controller", req.body);
+    console.log("Inside Server updateRideStatus Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err) {
             let response = { message:"Token Error. Please login again.", success:false };
@@ -313,7 +310,6 @@ exports.updateRideStatus = function(req, res, next) {
                         /** Update the availableSeats now in Ride Table  **/
                         rideService.updateRideDetailsAfterReject(req.body, function(err, data) {
                             if(err) {
-                                // console.log(err);
                                 let response = { message : "Something went wrong. Please try again later.", success : false };
                                 res.send(JSON.stringify(response));
                             }
@@ -355,10 +351,9 @@ exports.updateRideStatus = function(req, res, next) {
 sendNotification = function(username, rideTitle, rideId, userMessage) {
     /** Getting the device details of the user **/
     loginService.getRegisterUserDevice({"deviceUsername" : username}, function(err,data){
-        console.log("getRegisterUserDevice Error", err);      
-        console.log("getRegisterUserDevice Responce", data);
+        // console.log("getRegisterUserDevice Error", err);      
+        // console.log("getRegisterUserDevice Responce", data);
         if(err != null) {
-            // res.send(JSON.stringify(err));
             let response = { message:"Something went wrong. Please try again later.", success:false };
             res.send(JSON.stringify(response));
         }
@@ -395,19 +390,6 @@ var fcmCli = new FCM(SERVER_API_KEY);
 //     notification: { //notification object
 //         title: 'Suri', body: 'World!', sound : "default", badge: "1"
 //     }
-// };
-
-// var payloadMulticast = {
-//     registration_ids:["4564654654654654",
-//         '123123123',
-//         validDeviceRegistrationToken, //valid token among invalid tokens to see the error and ok response
-//         '123133213123123'],
-//     data: {
-//         url: "news"
-//     },
-//     priority: 'high',
-//     content_available: true,
-//     notification: { title: 'Suri', body: 'Multicast', sound : "default", badge: "1" }
 // };
 
 var callbackLog = function (sender, err, res) {

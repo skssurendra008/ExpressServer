@@ -74,6 +74,10 @@ exports.deleteRide = function(rideDeatils,callback) {
     dbUtil.deleteTable(postRideDetails,rideDeatils,callback);
 }
 
+exports.deleteBookedRide = function(rideDeatils, callback) {
+    console.log("inside deleteBookings method");
+    dbUtil.deleteTable(bookRideDetails, rideDeatils, callback);
+}
 // exports.updateRideStatusInRideTable = function(rideDeatils,callback) {
 //     console.log("inside updateRideStatusInRideTable method");
 //     dbUtil.updateRideStatusInRideTable(bookRideDetails,rideDeatils,callback);
