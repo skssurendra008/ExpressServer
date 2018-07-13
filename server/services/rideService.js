@@ -22,72 +22,68 @@ schedule.scheduleJob('0 0 * * *', () => {
 
 
 exports.postRide = function(userDeatils, callback) {
-    console.log("inside postRide method");
+    // console.log("inside postRide method");
     dbUtil.insertUser(postRideDetails, userDeatils, callback);
 }
 
 exports.getAllRide = function(userDeatils, callback) {
-    console.log("inside getAllRide method");
+    // console.log("inside getAllRide method");
     dbUtil.getAll(postRideDetails, userDeatils, callback);
 }
 
 exports.verifyBookedRide = function(userDeatils, callback) {
-    console.log("inside verifyBookedRide method");
+    // console.log("inside verifyBookedRide method");
     dbUtil.getAll(bookRideDetails, userDeatils, callback);
 }
 
 exports.bookRide = function(userDeatils, callback) {
-    console.log("inside bookRide method");
+    // console.log("inside bookRide method");
     dbUtil.insertUser(bookRideDetails, userDeatils, callback);
 }
 
 exports.getMyBookedRide = function(userDeatils, callback) {
-    console.log("inside getMyBookedRide method", userDeatils);
+    // console.log("inside getMyBookedRide method", userDeatils);
     // console.log(userDeatils.findWithManyIds);
     if (userDeatils.findWithManyIds == true) {
-        console.log("Filter with multiple Ids");
+        // console.log("Filter with multiple Ids");
        dbUtil.getAll(bookRideDetails, { uniqueRideName: { $in: userDeatils.uniqueRideName}}, callback);
     }
     else {
-        console.log("Filter with Single Id");
+        // console.log("Filter with Single Id");
         dbUtil.getAll(bookRideDetails, userDeatils, callback);
     }
 }
 
 exports.updateRideDetails = function(rideDeatils,callback) {
-    console.log("inside updateUserDetails method");
+    // console.log("inside updateUserDetails method");
     dbUtil.updateRideDetails(postRideDetails,rideDeatils,callback);
 }
 
 exports.updateRideDetailsAfterReject = function(rideDeatils,callback) {
-    console.log("inside updateRideDetailsAfterReject  method");
+    // console.log("inside updateRideDetailsAfterReject  method");
     dbUtil.updateRideDetailsAfterReject(postRideDetails,rideDeatils,callback);
 }
 
 exports.updateRideStatusInBookingTable = function(rideDeatils,callback) {
-    console.log("inside updateRideStatusInBookingTable method");
+    // console.log("inside updateRideStatusInBookingTable method");
     dbUtil.updateRideStatusInBookingTable(bookRideDetails,rideDeatils,callback);
 }
 
 exports.deleteRide = function(rideDeatils,callback) {
-    console.log("inside deleteRide method");
+    // console.log("inside deleteRide method");
     dbUtil.deleteTable(postRideDetails,rideDeatils,callback);
 }
 
 exports.deleteBookedRide = function(rideDeatils, callback) {
-    console.log("inside deleteBookings method");
+    // console.log("inside deleteBookings method");
     dbUtil.deleteTable(bookRideDetails, rideDeatils, callback);
 }
-// exports.updateRideStatusInRideTable = function(rideDeatils,callback) {
-//     console.log("inside updateRideStatusInRideTable method");
-//     dbUtil.updateRideStatusInRideTable(bookRideDetails,rideDeatils,callback);
-// }
 
 
 /** Email Sending **/
 var nodemailer = require("nodemailer");
 exports.sendEmail = function(emailtype, data) {
-    console.log("Send email = ", data);
+    // console.log("Send email = ", data);
     var smtpTransport = nodemailer.createTransport({
 		service: 'gmail',
 		// host: 'smtp.gmail.com',
@@ -108,7 +104,8 @@ exports.sendEmail = function(emailtype, data) {
         "<b>Name:</b> "+data.myusername+"<br>"+
         "<b>Email:</b> "+data.email+"<br>"+
         "<b>Mobile Number:</b> "+data.mobileNumber+"<br>"+
-        "<b>Drop Location:</b> "+data.destination+"<br><br>"+
+        "<b>Drop Location:</b> "+data.destination+"<br>"+
+        "<b>Departure:</b> "+data.departureTimeModified+"<br><br>"+
         "Please <b>Accept/Reject</b> ride in your <b>Offered Rides</b> tab for your convenience.<br><br>"+
         "Happy Riding !<br>"+
         "<b>Thanks,</b><br>"+
@@ -120,7 +117,8 @@ exports.sendEmail = function(emailtype, data) {
         var acceptRidehtml = "Hi "+data.myusername+", <br><br> Your booking request was <b> Accepted </b>. Below are the Owner details : <br>"+ 
         "<b>Name:</b> "+data.username+"<br>"+
         "<b>Email:</b> "+data.rideownerEmail+"<br>"+
-        "<b>Mobile Number:</b> "+data.rideownerMobileNumber+"<br><br>"+
+        "<b>Mobile Number:</b> "+data.rideownerMobileNumber+"<br>"+
+        "<b>Departure:</b> "+data.departureTimeModified+"<br><br>"+
         "<b>You can also check the Vehicle Owner detail in 'Booked Rides' tab of the App.</b><br><br>"+
         // "<b>Drop Location:</b> "+Baner+"<br><br>"+
         "Happy Riding !<br>"+
