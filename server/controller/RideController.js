@@ -7,7 +7,7 @@ var loginService = require('../services/loginService'); //import login service
 
 // To post new Ride
 exports.postRide = function(req, res, next) {
-    console.log("Inside Server postRide Controller",req.body);
+    console.log("Inside Server postRide Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err) {
             let response = { message:"Token Error. Please login again.", success:false };
@@ -15,7 +15,6 @@ exports.postRide = function(req, res, next) {
         } else {
             rideService.postRide(req.body, function(err, data) {
                 if(err != null) {
-                    console.log("Post Ride Error",err);
                     let response = { message:"This Useremail has already taken.", success:true };
                     if(err.errmsg.indexOf("user_username") > -1) {
                         response.message = "This Username has already taken."
@@ -23,7 +22,7 @@ exports.postRide = function(req, res, next) {
                     res.send(JSON.stringify(response));
                 }
                 else {
-                    let response = { message:"The ride has been offered, please Accept/Reject bookings in 'Offered Rides' tab.", success:true };
+                    let response = { message:"You have offered a ride, please check 'Offered Rides' to Accept/Reject bookings.", success:true };
                     res.send(JSON.stringify(response));
                 }
             });
@@ -35,8 +34,7 @@ exports.postRide = function(req, res, next) {
 exports.getAllRide = function(req, res, next) {
     console.log("Inside Server getAllRide Controller");
     if(req.body.rideownerUsername) {
-        rideService.getAllRide( {$and: [{"departureTime": {$gte: new Date()}}, {"rideownerUsername":{$ne: req.body.rideownerUsername}}] }, function(err, data){
-            // console.log("getAllRide Error",err);
+        rideService.getAllRide( {$and: [{"departureTime": {$gte: new Date()}}, {"availableSeats": {$gt: 0}}, {"rideownerUsername":{$ne: req.body.rideownerUsername}}] }, function(err, data){
             if(err != null) {
                 let response = { message:"This Useremail has already taken.", success:true };
                 if(err.errmsg.indexOf("user_username") > -1) {
@@ -50,10 +48,8 @@ exports.getAllRide = function(req, res, next) {
         });
     }
     else {
-        rideService.getAllRide({"departureTime": {$gte: new Date()}}, function(err, data){
-            // console.log("getAllRide Error",err);
+        rideService.getAllRide( {$and: [{"departureTime": {$gte: new Date()}} , {"availableSeats": {$gt: 0}}] }, function(err, data){
             if(err != null) {
-                // res.send(JSON.stringify(err));
                 let response = { message:"This Useremail has already taken.", success:true };
                 if(err.errmsg.indexOf("user_username") > -1) {
                     response.message = "This Username has already taken."
@@ -61,7 +57,6 @@ exports.getAllRide = function(req, res, next) {
                 res.send(JSON.stringify(response));
             }
             else {
-                // console.log(data);
                 res.send(JSON.stringify(data));
             }
         });
@@ -71,7 +66,7 @@ exports.getAllRide = function(req, res, next) {
 
 // to get myPostedRides
 exports.myPostedRides = function(req, res, next) {
-    console.log("Inside Server myPostedRides Controller", req.body);
+    console.log("Inside Server myPostedRides Controller");
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err) {
             let response = { message:"Token Error. Please login again.", success:false };
@@ -79,7 +74,6 @@ exports.myPostedRides = function(req, res, next) {
         } else {
             rideService.getAllRide(req.body, function(err, data){
                 if(err != null) {
-                    // console.log("myPostedRides Error",err);
                     let response = { message:"This Useremail has already taken.", success:true };
                     if(err.errmsg.indexOf("user_username") > -1) {
                         response.message = "This Username has already taken."
@@ -103,9 +97,7 @@ exports.bookRide = function(req, res, next) {
             res.send(JSON.stringify(response));
         } else {
             rideService.getAllRide({"_id": req.body.rideId}, function(err, data){
-                // console.log("getAllRide Error",err);
                 if(err != null) {
-                    // res.send(JSON.stringify(err));
                     let response = { message:"Something went wrong.", success:false };
                     res.send(JSON.stringify(response));
                 }
@@ -117,8 +109,6 @@ exports.bookRide = function(req, res, next) {
                     }
                     else { /** Check is You have already booked this Ride **/
                         rideService.verifyBookedRide({"uniqueRideName": req.body.uniqueRideName}, function(err, data){
-                            // console.log("verifyBookedRide Error", err);
-                            // console.log("verifyBookedRide Data", data);
                             if(err != null) {
                                 let response = { message:"Something went wrong. Please try again later.", success:false };
                                 res.send(JSON.stringify(response));
@@ -130,8 +120,6 @@ exports.bookRide = function(req, res, next) {
                                 }
                                 else { /** Add booking in the booking table **/
                                     rideService.bookRide(req.body, function(err, data){
-                                        // console.log("Book Ride Error",err);
-                                        // console.log("Booked Ride Data",data);
                                         if(err != null) {
                                             let response = { message:"Something went wrong. Please try again later.", success:false };
                                             res.send(JSON.stringify(response));
@@ -141,8 +129,7 @@ exports.bookRide = function(req, res, next) {
                                             /** 1. Reduce/Update the availableSeats from AllRides table **/
                                             /** 2. Add booking in bookings array of AllRides table **/
                                             rideService.updateRideDetails(req.body,function(updaterideerr, updateridedata){
-                                                console.log("updateRideDetails Error", updaterideerr);
-                                                // console.log("updateRideDetails Response", updateridedata);
+                                                // console.log("updateRideDetails Error", updaterideerr);
                                                 if(updaterideerr) {
                                                     /** 1. delete the booked ride from 'bookedRideDetails' table **/
                                                     rideService.deleteBookedRide(data._id, function(err,data) {
@@ -189,12 +176,10 @@ exports.myBookedRide = function(req, res, next) {
         } else {
             rideService.getMyBookedRide(req.body, function(err, data) {
                 if(err != null) {
-                    // console.log("myBookedRide Error", err);
                     let response = { message : "Something went wrong. Please try again later.", success : false };
                     res.send(JSON.stringify(response));
                 }
                 else {
-                    // console.log("BookedRide Data", data);
                     let response = { success : true, data: data};
                     res.send(JSON.stringify(response));
                 }
@@ -220,13 +205,15 @@ exports.cancelTrip = function(req, res, next) {
                     bookingStatusDetails.uniqueRideName = allBookings[x].uniqueRideName;
                     bookingStatusDetails.bookingStatus = "Cancel Trip";
                     rideService.updateRideStatusInBookingTable(bookingStatusDetails, function(err, data) {
-                        // console.log("Cancel Trip =  ", data);
                         if(err) {
                             let response = { message : "Something went wrong. Please try again later.", success : false };
                             res.send(JSON.stringify(response));
                         }
                         else {
                             // /** Sending email to the ride booked user **/
+                            var modefiedDepartureTime = allBookings[x].departureTime.split("T");
+                            var modefiedDepartureTime2 = modefiedDepartureTime[1].substring(0, 5);
+                            allBookings[x].departureTime = modefiedDepartureTime[0] + "," +modefiedDepartureTime2;
                             rideService.sendEmail("canceltrip", allBookings[x]);
 
                             /** Sending notification to the ride booked user **/
@@ -244,7 +231,7 @@ exports.cancelTrip = function(req, res, next) {
                         res.send(JSON.stringify(response));
                     }
                     else {
-                        let response = { message:"You Trip has been Cancelled.", success:true };
+                        let response = { message:"Your trip has been cancelled.", success:true };
                         res.send(JSON.stringify(response));
                     }
                 });
@@ -256,7 +243,7 @@ exports.cancelTrip = function(req, res, next) {
                         res.send(JSON.stringify(response));
                     }
                     else {
-                        let response = { message:"Your Trip has been Cancelled.", success:true };
+                        let response = { message:"Your trip has been cancelled.", success:true };
                         res.send(JSON.stringify(response));
                     }
                 });
@@ -277,22 +264,19 @@ exports.updateRideStatus = function(req, res, next) {
         } else {
             rideService.updateRideStatusInBookingTable(req.body,function(err,data) {
                 if(err) {
-                    // console.log("Error ", err);
                     let response = { message : "Something went wrong. Please try again later.", success : false };
                     res.send(JSON.stringify(response));
                 }
                 else {
-                    // console.log("responce",data);
                     if(req.body.bookingStatus == "Reject") {
                         /** Update the availableSeats now in Ride Table  **/
                         rideService.updateRideDetailsAfterReject(req.body, function(err, data) {
                             if(err) {
-                                // console.log(err);
                                 let response = { message : "Something went wrong. Please try again later.", success : false };
                                 res.send(JSON.stringify(response));
                             }
                             else {
-                                let response = { message:"Booking Reject Successfully.", success:true };
+                                let response = { message:"Booking has been rejected.", success:true };
                                 res.send(JSON.stringify(response));
 
                                 /** Sending email to the ride booked user **/
@@ -314,7 +298,7 @@ exports.updateRideStatus = function(req, res, next) {
                                 res.send(JSON.stringify(response));
                             }
                             else {
-                                let response = { message:"Booking Cancelled Successfully.", success:true };
+                                let response = { message:"Booking has been cancelled.", success:true };
                                 res.send(JSON.stringify(response));
 
                                 /** Sending email to the ride owner user **/
@@ -329,7 +313,7 @@ exports.updateRideStatus = function(req, res, next) {
                         });
                     }
                     else {
-                        let response = { message:"Booking Accepted Successfully.", success:true };
+                        let response = { message:"Booking has been accepted.", success:true };
                         res.send(JSON.stringify(response));
                         
                         /** Sending email to the ride booked user **/
@@ -351,8 +335,6 @@ exports.updateRideStatus = function(req, res, next) {
 sendNotification = function(username, rideTitle, rideId, userMessage) {
     /** Getting the device details of the user **/
     loginService.getRegisterUserDevice({"deviceUsername" : username}, function(err,data){
-        // console.log("getRegisterUserDevice Error", err);      
-        // console.log("getRegisterUserDevice Responce", data);
         if(err != null) {
             let response = { message:"Something went wrong. Please try again later.", success:false };
             res.send(JSON.stringify(response));
@@ -378,20 +360,6 @@ var SERVER_API_KEY='AAAAzmkEHgY:APA91bGbOCPYlKduXCMEkGr-nJbsZYWOpzzIzOWo9hpNYCdU
 // var validDeviceRegistrationToken = 'eDAH0FeQ01M:APA91bFiGJsi1wYvRMd-wJSim2CeOqVKLQHkuiYwXZqugV0p4R8lC3TSrKmkq1_kiSFOeM81Nx5KrorKhlpWNiwx6Jm73zsN6clHwsti80KCDzFbZl-m_w-SwGdyEUSZxxNDBBVm3hXi6HkiPY8H3faYDR5m4ca4_Q'; //put a valid device token here
 var fcmCli = new FCM(SERVER_API_KEY);
 
-// var payloadOK = {
-//     to: validDeviceRegistrationToken,
-//     data: { //some data object (optional)
-//         url: 'news',
-//         foo:'fooooooooooooo',
-//         bar:'bar bar bar'
-//     },
-//     priority: 'high',
-//     content_available: true,
-//     notification: { //notification object
-//         title: 'Suri', body: 'World!', sound : "default", badge: "1"
-//     }
-// };
-
 var callbackLog = function (sender, err, res) {
     console.log("\n__________________________________")
     console.log("\t"+sender);
@@ -402,9 +370,6 @@ var callbackLog = function (sender, err, res) {
 };
 
 sendNotificationToAndroid = function (validDeviceRegistrationToken, rideTitle, rideId, message) {
-    // fcmCli.send(payloadOK, function(err, res){
-    //     callbackLog('sendOK', err, res);
-    // });
     fcmCli.send( {
         to: validDeviceRegistrationToken,
         data: { //some data object (optional)
