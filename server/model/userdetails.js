@@ -23,7 +23,7 @@ var UserDetailsSchema = mongoose.Schema({
          require: true
     },
     user_mobile: {
-        type: Number
+        type: String
     },
     user_email: {
         type: String,
@@ -36,6 +36,9 @@ var UserDetailsSchema = mongoose.Schema({
     user_type: {
         type: String
     },
+    officeLocation: {
+        type: String
+    },
     homeLocation: {
         type: String
     },
