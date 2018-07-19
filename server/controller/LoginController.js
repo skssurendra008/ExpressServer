@@ -7,7 +7,7 @@ var loginService = require('../services/loginService');
 
 // To check user availability while login
 exports.login = function(req, res, next) {
-    console.log("Inside Server Login Controller", req.body);
+    console.log("Inside Server Login Controller");
     var userDeaits = {"user_username": req.body.user_username};
     loginService.login(userDeaits, function(err,data){
         if (err) {
@@ -90,7 +90,7 @@ exports.getUserDetails = function(req, res, next) {
 exports.registerUser = function(req, res, next) {
     console.log("Inside Server registerUser Controller");
     loginService.registerUser(req.body,function(err, data) {
-        console.log("RegisterUser = ", data);
+        // console.log("RegisterUser = ", data);
         // console.log("RegisterUser Error = ", err);
         if(err != null) {
             let response = { message:"", success:true };
@@ -247,7 +247,7 @@ exports.forgetPassword = function(req, res, next) {
 /** Email Sending **/
 var nodemailer = require("nodemailer");
 sendEmail = function(data, res, responseMessageObj) {
-    console.log("Send email = ", data);
+    // console.log("Send email = ", data);
     var smtpTransport = nodemailer.createTransport({
 		service: 'gmail',
 		// host: 'smtp.gmail.com',
@@ -284,12 +284,12 @@ sendEmail = function(data, res, responseMessageObj) {
 	// send mail with defined transport object
 	smtpTransport.sendMail(mailOptions, function(error, response){
 		if(error) {
-            console.log(error);
+            // console.log(error);
             responseMessageObj.success = false;
             responseMessageObj.message = "Something went wrong. Please try again later.";
             res.send(responseMessageObj);
 		} else {
-            console.log("Email sent: ", response);
+            // console.log("Email sent: ", response);
             res.send(responseMessageObj);
 		}
 	});

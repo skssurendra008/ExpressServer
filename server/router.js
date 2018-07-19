@@ -32,7 +32,7 @@ router.get('/',function(req,res,next){
 /** Verify JWT Token **/
 function verifyToken(req, res, next) {
     const headerToken = req.headers['authorization'];
-    console.log("headerToken ", headerToken);
+    // console.log("headerToken ", headerToken);
     if (typeof headerToken != 'undefined' && headerToken) {
         // console.log("1");
         req.token = headerToken;

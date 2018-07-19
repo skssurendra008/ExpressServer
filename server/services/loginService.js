@@ -4,22 +4,22 @@ var ess_userdetails = require('../model/userdetails');
 var userDeviceDetails = require('../model/userDeviceDetails');
 
 exports.login = function(userDeatils,callback) {
-    console.log("inside login method");
+    // console.log("inside login method");
     dbUtil.getAll(ess_userdetails,userDeatils,callback);
 }
 
 exports.registerUser = function(userDeatils,callback) {
-    console.log("inside registerUser method");
+    // console.log("inside registerUser method");
     dbUtil.insertUser(ess_userdetails,userDeatils,callback);
 }
 
 exports.updateUserDetails = function(userDeatils,callback) {
-    console.log("inside updateUserDetails method");
+    // console.log("inside updateUserDetails method");
     dbUtil.updateUserDetails(ess_userdetails,userDeatils,callback);
 }
 
 exports.updateUsercompleteDetails = function(userDeatils,callback) {
-    console.log("inside updateUsercompleteDetails method");
+    // console.log("inside updateUsercompleteDetails method");
     let updatedDetails = {};
     updatedDetails['user_type'] = userDeatils.user_type;
     updatedDetails['user_mobile'] = userDeatils.user_type;
@@ -37,20 +37,20 @@ exports.updateUsercompleteDetails = function(userDeatils,callback) {
 }
 
 exports.getRegisterUserDevice = function(userDeatils,callback) {
-    console.log("inside registerUserDevice method");
+    // console.log("inside registerUserDevice method");
     dbUtil.getAll(userDeviceDetails, userDeatils,callback);
 }
 
 exports.registerUserDevice = function(userDeatils,callback) {
-    console.log("inside registerUserDevice method");
+    // console.log("inside registerUserDevice method");
     dbUtil.insertUser(userDeviceDetails, userDeatils,callback);
 }
 
 exports.updateRegisterUserDevice = function(userDeatils,callback) {
-    console.log("inside updateRegisterUserDevice method");
+    // console.log("inside updateRegisterUserDevice method");
     let updatedDetails = {};
     updatedDetails['deviceRegisteredId'] = userDeatils.deviceRegisteredId;
-    console.log(updatedDetails);
+    // console.log(updatedDetails);
 
     let updateWith = {};
     updateWith['deviceUsername'] = userDeatils.deviceUsername;
@@ -59,7 +59,7 @@ exports.updateRegisterUserDevice = function(userDeatils,callback) {
 }
 
 exports.deleteUser = function(rideDeatils,callback) {
-    console.log("inside deleteUser method");
+    // console.log("inside deleteUser method");
     dbUtil.deleteTable(ess_userdetails, rideDeatils, callback);
 }
    
