@@ -3,18 +3,16 @@ var dbUtil = require('../utility/ess_DBUtilConn');
 var ess_userdetails = require('../model/userdetails');
 var userDeviceDetails = require('../model/userDeviceDetails');
 
-exports.login = function(userDeatils,callback) {
-    // console.log("inside login method");
+/********************* userdetails Table Operations *********************/
+exports.getDataFromUserdetailsTable = function(userDeatils,callback) {
     dbUtil.getAll(ess_userdetails,userDeatils,callback);
 }
 
-exports.registerUser = function(userDeatils,callback) {
-    // console.log("inside registerUser method");
+exports.insertDataInUserdetailsTable = function(userDeatils,callback) {
     dbUtil.insertUser(ess_userdetails,userDeatils,callback);
 }
 
 exports.updateUserDetails = function(userDeatils,callback) {
-    // console.log("inside updateUserDetails method");
     dbUtil.updateUserDetails(ess_userdetails,userDeatils,callback);
 }
 
@@ -36,13 +34,20 @@ exports.updateUsercompleteDetails = function(userDeatils,callback) {
     dbUtil.updateDetails(ess_userdetails, updateWith, userDeatils, callback);
 }
 
-exports.getRegisterUserDevice = function(userDeatils,callback) {
-    // console.log("inside registerUserDevice method");
+exports.deleteUser = function(rideDeatils,callback) {
+    dbUtil.deleteTable(ess_userdetails, rideDeatils, callback);
+}
+
+/********************************************************************************************/
+
+
+
+/*************** userDeviceDetails table Operations ************/
+exports.getDataFromUserDevicedetailsTable = function(userDeatils,callback) {
     dbUtil.getAll(userDeviceDetails, userDeatils,callback);
 }
 
-exports.registerUserDevice = function(userDeatils,callback) {
-    // console.log("inside registerUserDevice method");
+exports.insertDataInUserDevicedetailsTable = function(userDeatils,callback) {
     dbUtil.insertUser(userDeviceDetails, userDeatils,callback);
 }
 
@@ -58,8 +63,4 @@ exports.updateRegisterUserDevice = function(userDeatils,callback) {
     dbUtil.updateDetails(userDeviceDetails, updateWith, userDeatils,callback);
 }
 
-exports.deleteUser = function(rideDeatils,callback) {
-    // console.log("inside deleteUser method");
-    dbUtil.deleteTable(ess_userdetails, rideDeatils, callback);
-}
-   
+/********************************************************************************************/

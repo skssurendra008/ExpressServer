@@ -2,30 +2,48 @@
 var express = require('express');
 const jwt = require('jsonwebtoken');
 
+var moment = require('moment');
+
 var rideService = require('../services/rideService'); //import ride service
 var loginService = require('../services/loginService'); //import login service
 
 // To post new Ride
 exports.postRide = function(req, res, next) {
-    console.log("Inside Server postRide Controller");
+    console.log("Inside Server postRide Controller" , req.body);
+    
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if(err) {
             let response = { message:"Token Error. Please login again.", success:false };
             res.send(JSON.stringify(response));
         } else {
-            rideService.postRide(req.body, function(err, data) {
-                if(err != null) {
-                    let response = { message:"This Useremail has already taken.", success:true };
-                    if(err.errmsg.indexOf("user_username") > -1) {
-                        response.message = "This Username has already taken."
-                    }
-                    res.send(JSON.stringify(response));
+            let start = moment.utc(req.body.departureTime);
+            let end = moment.utc(req.body.departureEndDate);
+            let count = end.diff(start, 'days');
+            // console.log("Count is "+ count);
+
+            for(let i=0; i<= count; i++) {
+                if(moment.utc(req.body.departureTime).day() == "0" || moment.utc(req.body.departureTime).day() == "6") {
+                    req.body.departureTime = moment.utc(req.body.departureTime).add(1, 'day').format('YYYY-MM-DDTHH:mm:ssZ');
+                } else {
+                    // console.log(req.body.departureTime);
+                    // insert Data into DB;
+                    rideService.postRide(req.body, function(err, data) {
+                        if(err != null) {
+                            let response = { message:"Something went wrong. Please try again later.", success:false };
+                            res.send(JSON.stringify(response));
+                            return;
+                        }
+                        else {
+                            if(i == count ) {
+                                let response = { message:"You have offered a ride, please check 'Offered Rides' to Accept/Reject bookings.", success:true };
+                                res.send(JSON.stringify(response));
+                            }
+                        }
+                    });
+                    req.body.departureTime = moment.utc(req.body.departureTime).add(1, 'day').format('YYYY-MM-DDTHH:mm:ssZ');
+                    
                 }
-                else {
-                    let response = { message:"You have offered a ride, please check 'Offered Rides' to Accept/Reject bookings.", success:true };
-                    res.send(JSON.stringify(response));
-                }
-            });
+            }
         }
     });
 }
@@ -334,7 +352,7 @@ exports.updateRideStatus = function(req, res, next) {
 
 sendNotification = function(username, rideTitle, rideId, userMessage) {
     /** Getting the device details of the user **/
-    loginService.getRegisterUserDevice({"deviceUsername" : username}, function(err,data){
+    loginService.getDataFromUserDevicedetailsTable({"deviceUsername" : username}, function(err,data){
         if(err != null) {
             let response = { message:"Something went wrong. Please try again later.", success:false };
             res.send(JSON.stringify(response));

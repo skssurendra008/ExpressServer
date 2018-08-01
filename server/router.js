@@ -6,10 +6,12 @@ var rideController = require('../server/controller/RideController');
 
 
 router.post('/login', userLoginController.login);
-router.post('/userDetails', verifyToken, userLoginController.getUserDetails);
 router.post('/registerUser',userLoginController.registerUser);
-router.post('/updateUserDetails', verifyToken, userLoginController.updateUserDetails);
 router.post('/forgetPassword',userLoginController.forgetPassword);
+
+router.post('/registerUserDetails', userLoginController.registerUserDetails);
+router.post('/userDetails', verifyToken, userLoginController.getUserDetails);
+router.post('/updateUserDetails', verifyToken, userLoginController.updateUserDetails);
 
 // router.post('/registerUserDevice',userLoginController.registerUserDevice);
 

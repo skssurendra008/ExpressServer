@@ -10,18 +10,18 @@ var UserDetailsSchema = mongoose.Schema({
         type: String,
         require: true
     },
-//     user_firstname: {
-//         type: String,
-//         require: true
-//     },
-//     user_lastname: {
-//         type: String,
-//         require: true
-//     },
-    user_password: {
-         type: String,
-         require: true
-    },
+    user_firstname: {
+        type: String,
+        require: true
+    },
+    user_lastname: {
+        type: String,
+        require: true
+    },
+//     user_password: {
+//          type: String,
+//          require: true
+//     },
     user_mobile: {
         type: String
     },
