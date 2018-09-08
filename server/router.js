@@ -5,9 +5,9 @@ var userLoginController = require('../server/controller/LoginController');
 var rideController = require('../server/controller/RideController');
 
 
-router.post('/login', userLoginController.login);
-router.post('/registerUser',userLoginController.registerUser);
-router.post('/forgetPassword',userLoginController.forgetPassword);
+// router.post('/login', userLoginController.login);
+// router.post('/registerUser',userLoginController.registerUser);
+// router.post('/forgetPassword',userLoginController.forgetPassword);
 
 router.post('/registerUserDetails', userLoginController.registerUserDetails);
 router.post('/userDetails', verifyToken, userLoginController.getUserDetails);
@@ -17,7 +17,7 @@ router.post('/updateUserDetails', verifyToken, userLoginController.updateUserDet
 
 
 router.post('/postRide', verifyToken, rideController.postRide);
-router.post('/getAllRide', rideController.getAllRide);
+router.post('/getAllRide', verifyToken, rideController.getAllRide);
 router.post('/myPostedRides', verifyToken, rideController.myPostedRides);
 router.post('/bookRide', verifyToken, rideController.bookRide);
 router.post('/myBookedRide', verifyToken, rideController.myBookedRide);

@@ -42,6 +42,9 @@ var UserDetailsSchema = mongoose.Schema({
     homeLocation: {
         type: String
     },
+    rideTitle: {
+        type: String
+    },
     rideRoute: {
         type: String
     },

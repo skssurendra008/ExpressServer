@@ -22,10 +22,10 @@ exports.postRide = function(req, res, next) {
             // console.log("Count is "+ count);
 
             for(let i=0; i<= count; i++) {
+                // console.log(req.body.departureTime);
                 if(moment.utc(req.body.departureTime).day() == "0" || moment.utc(req.body.departureTime).day() == "6") {
                     req.body.departureTime = moment.utc(req.body.departureTime).add(1, 'day').format('YYYY-MM-DDTHH:mm:ssZ');
                 } else {
-                    // console.log(req.body.departureTime);
                     // insert Data into DB;
                     rideService.postRide(req.body, function(err, data) {
                         if(err != null) {
@@ -33,16 +33,21 @@ exports.postRide = function(req, res, next) {
                             res.send(JSON.stringify(response));
                             return;
                         }
-                        else {
-                            if(i == count ) {
-                                let response = { message:"You have offered a ride, please check 'Offered Rides' to Accept/Reject bookings.", success:true };
-                                res.send(JSON.stringify(response));
-                            }
-                        }
+                        // else {
+                        //     if(i == count ) {
+                        //         let response = { message:"You have offered a ride, please check 'Offered Rides' to Accept/Reject bookings.", success:true };
+                        //         res.send(JSON.stringify(response));
+                        //     }
+                        // }
                     });
-                    req.body.departureTime = moment.utc(req.body.departureTime).add(1, 'day').format('YYYY-MM-DDTHH:mm:ssZ');
-                    
+                    req.body.departureTime = moment.utc(req.body.departureTime).add(1, 'day').format('YYYY-MM-DDTHH:mm:ssZ'); 
                 }
+
+                if(i == count ) {
+                    let response = { message:"You have offered rides, please check 'Offered Rides' to Accept/Reject bookings.", success:true };
+                    res.send(JSON.stringify(response));
+                }
+                
             }
         }
     });
@@ -51,35 +56,44 @@ exports.postRide = function(req, res, next) {
 // To get AllRide
 exports.getAllRide = function(req, res, next) {
     console.log("Inside Server getAllRide Controller");
-    if(req.body.rideownerUsername) {
-        rideService.getAllRide( {$and: [{"departureTime": {$gte: new Date()}}, {"availableSeats": {$gt: 0}}, {"rideownerUsername":{$ne: req.body.rideownerUsername}}] }, function(err, data){
-            if(err != null) {
-                let response = { message:"This Useremail has already taken.", success:true };
-                if(err.errmsg.indexOf("user_username") > -1) {
-                    response.message = "This Username has already taken."
-                }
-                res.send(JSON.stringify(response));
-            }
-            else {
-                res.send(JSON.stringify(data));
-            }
-        });
-    }
-    else {
-        rideService.getAllRide( {$and: [{"departureTime": {$gte: new Date()}} , {"availableSeats": {$gt: 0}}] }, function(err, data){
-            if(err != null) {
-                let response = { message:"This Useremail has already taken.", success:true };
-                if(err.errmsg.indexOf("user_username") > -1) {
-                    response.message = "This Username has already taken."
-                }
-                res.send(JSON.stringify(response));
-            }
-            else {
-                res.send(JSON.stringify(data));
-            }
-        });
-    }
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if(err) {
+            let response = { message:"Token Error. Please login again.", success:false };
+            res.send(JSON.stringify(response));
+        } else {
+            var start = moment.utc().startOf('day'); // set to 12:00 am today
+            var end = moment.utc().endOf('day'); // set to 23:59 pm today
 
+            if(req.body.rideownerUsername) {
+                rideService.getAllRide( {$and: [{"departureTime": {$gte: start}}, {"departureTime": {$lt: end}} , {"availableSeats": {$gt: 0}}, {"rideownerUsername":{$ne: req.body.rideownerUsername}}] }, function(err, data){
+                    if(err != null) {
+                        let response = { message:"This Useremail has already taken.", success:true };
+                        if(err.errmsg.indexOf("user_username") > -1) {
+                            response.message = "This Username has already taken."
+                        }
+                        res.send(JSON.stringify(response));
+                    }
+                    else {
+                        res.send(JSON.stringify(data));
+                    }
+                });
+            }
+            else {
+                rideService.getAllRide( {$and: [{"departureTime": {$gte: start}}, {"departureTime": {$lt: end}} , {"availableSeats": {$gt: 0}}] }, function(err, data){
+                    if(err != null) {
+                        let response = { message:"This Useremail has already taken.", success:true };
+                        if(err.errmsg.indexOf("user_username") > -1) {
+                            response.message = "This Username has already taken."
+                        }
+                        res.send(JSON.stringify(response));
+                    }
+                    else {
+                        res.send(JSON.stringify(data));
+                    }
+                });
+            }
+        }
+    });
 }
 
 // to get myPostedRides
