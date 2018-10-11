@@ -143,14 +143,9 @@ exports.registerUserDetails = function(req, res, next) {
                 let deviceResponse = registerUserDevice(deviceDetails);
             }
             else {
+                req.body.rewardPoints = 0;
                 loginService.insertDataInUserdetailsTable(req.body,function(err, data) {
                     if(err != null) {
-                        // let response = { message:"", success:true };
-                        // if(err.errmsg.indexOf("user_username") > -1) {
-                        //     response.message = "The username is already registered."
-                        // } else if(err.errmsg.indexOf("user_email") > -1) {
-                        //     response.message = "The email address is already registered."
-                        // }
                         let response = { message:"Something went wrong. Please login again.", success:false };
                         res.send(JSON.stringify(response));
                     }

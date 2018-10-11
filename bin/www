@@ -29,6 +29,31 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+
+
+/*** Create HTTPS Server Request Start ***/
+var fs = require('fs');
+var https = require('https');
+var privateKey  = fs.readFileSync('/ExpressServer/privatekey.key', 'utf8');
+var certificate = fs.readFileSync('/ExpressServer/cert.pem', 'utf8');
+var pass = 'admin123';
+
+var credentials = {key: privateKey, cert: certificate, passphrase: pass};
+var express = require('express');
+
+// your express configuration here
+var httpsServer = https.createServer(credentials, app);
+
+var porthttps = normalizePort(process.env.PORT || '443');
+app.set('porthttps', porthttps);
+
+httpsServer.listen(porthttps);
+httpsServer.on('error', onError);
+httpsServer.on('listening', onListening1);
+/*** Create HTTPS Server Request End ***/
+
+
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -43,6 +68,7 @@ function normalizePort(val) {
 
   if (port >= 0) {
     // port number
+    console.log("Returned port is ", port)
     return port;
   }
 
@@ -86,6 +112,15 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
+  console.log('Listening on ' + bind);
+  debug('Listening on ' + bind);
+}
+
+function onListening1() {
+  var addrhttps = httpsServer.address();
+  var bind = typeof addrhttps === 'string'
+    ? 'pipe ' + addrhttps
+    : 'porthttps ' + addrhttps.porthttps;
   console.log('Listening on ' + bind);
   debug('Listening on ' + bind);
 }

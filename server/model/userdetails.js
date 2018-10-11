@@ -59,6 +59,15 @@ var UserDetailsSchema = mongoose.Schema({
     },
     availableSeats: {
         type: Number
+    },
+    rewardPoints: {
+        type: Number
+    },
+    deviceRegisteredId: {
+        type: String
+    },
+    devicePlatform: {
+        type: String
     }/*,
      user_address: {
          type: String

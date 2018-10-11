@@ -5,12 +5,12 @@ var bookRideDetails = require('../model/bookRideDetails');
 
 // run everyday at midnight 
 /** 1. By Node Scheduler **/
-var schedule = require('node-schedule');
-schedule.scheduleJob('0 0 * * *', () => { 
-    console.log("Schedule Started");
-    dbUtil.delete(postRideDetails, function(err, data){});
-    dbUtil.delete(bookRideDetails, function(err, data){});
-});
+// var schedule = require('node-schedule');
+// schedule.scheduleJob('0 0 * * *', () => { 
+//     console.log("Schedule Started");
+//     dbUtil.delete(postRideDetails, function(err, data){});
+//     dbUtil.delete(bookRideDetails, function(err, data){});
+// });
 
 /** 2. By setInterval **/
 // var myInt = setInterval(function () {

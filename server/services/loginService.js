@@ -16,6 +16,10 @@ exports.updateUserDetails = function(userDeatils,callback) {
     dbUtil.updateUserDetails(ess_userdetails,userDeatils,callback);
 }
 
+exports.updateUserRewardPoints = function(userDeatils,callback) {
+    dbUtil.updateUserRewardPoints(ess_userdetails,userDeatils,callback);
+}
+
 exports.updateUsercompleteDetails = function(userDeatils,callback) {
     // console.log("inside updateUsercompleteDetails method");
     let updatedDetails = {};

@@ -40,6 +40,16 @@ exports.updateUserDetails = function(Table, queryParam, callback) {
     // });
 }
 
+exports.updateUserRewardPoints = function(Table, queryParam, callback) {
+    // console.log("Inside DBUtilConn updateUserRewardPoints method");
+    // let incrementedDetail = ""+queryParam.incrementedDetail;
+    let incrementedvalue = queryParam.incrementedvalue;
+    // console.log(queryParam)
+    Table.update({'user_username': queryParam.user_username},  { $inc: {rewardPoints: incrementedvalue} }, function(err, doc){
+        callback(err,doc);
+    });
+}
+
 exports.updateDetails = function(Table, updateWith, updatedDetails, callback) {
     // console.log("Inside DBUtilConn updateDetails method");
     Table.update(updateWith, updatedDetails, function(err, doc){
